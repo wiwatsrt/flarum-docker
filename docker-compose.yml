@@ -29,6 +29,7 @@ services:
   db:
     restart: always
     image: mariadb:10.1
+    env_file: .env
     volumes:
       - ./mysql/databases:/var/lib/mysql
       - ./log/mysql:/var/log/mysql
