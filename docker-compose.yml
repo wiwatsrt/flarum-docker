@@ -10,20 +10,20 @@ services:
     links:
       - phpfpm:phpfpm
     volumes:
-      - ./www/:/var/www
+      - ./www/:/var/www/html
       - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./logs/nginx:/var/log/nginx
 
   phpfpm:
-    build: ./php-fpm-7
+    build: ./phpfpm
     restart: always
     links:
       - db:db
     volumes:
-      - ./www/:/var/www
-      - ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf
-      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./www/:/var/www/html
+      - ./phpfpm/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ./phpfpm/php.ini:/usr/local/etc/php/php.ini
       - ./logs/php-fpm:/var/log/php-fpm
 
   db:
@@ -38,4 +38,4 @@ services:
   composer:
     build: ./composer
     volumes:
-      - ./www/:/var/www
+      - ./www/:/var/www/html
