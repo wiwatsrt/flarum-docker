@@ -1,0 +1,5 @@
+.env
+cache
+log
+mysql/databases/
+www/
