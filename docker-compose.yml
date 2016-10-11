@@ -10,18 +10,19 @@ services:
     links:
       - phpfpm:phpfpm
     volumes:
-      - ./www/:/var/www/html
+      - ./cache/nginx:/var/cache/nginx
+      - ./www:/usr/share/nginx/html
       - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./logs/nginx:/var/log/nginx
 
   phpfpm:
-    build: ./phpfpm
+    image: wiwatsrt/flarum-docker-phpfpm
     restart: always
     links:
       - db:db
     volumes:
-      - ./www/:/var/www/html
+      - ./www:/usr/share/nginx/html
       - ./phpfpm/php-fpm.conf:/usr/local/etc/php-fpm.conf
       - ./phpfpm/php.ini:/usr/local/etc/php/php.ini
       - ./logs/php-fpm:/var/log/php-fpm
@@ -31,11 +32,11 @@ services:
     restart: always
     volumes:
       - ./mysql/initdb/:/docker-entrypoint-initdb.d
-      - ./mysql/data/:/var/lib/mysql
+      # - ./mysql/data/:/var/lib/mysql
       - ./logs/mysql:/var/log/mysql
     env_file: .env
 
   composer:
-    build: ./composer
+    image: wiwatsrt/flarum-docker-composer
     volumes:
-      - ./www/:/var/www/html
+      - ./www/:/usr/share/nginx/html

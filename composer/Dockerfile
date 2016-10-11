@@ -2,7 +2,7 @@ FROM php:7.1-alpine
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer 
 
-WORKDIR /var/www/html
+WORKDIR /usr/share/nginx/html
 
 RUN composer self-update
 
