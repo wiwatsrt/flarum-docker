@@ -32,7 +32,7 @@ services:
     restart: always
     volumes:
       - ./mysql/initdb/:/docker-entrypoint-initdb.d
-      # - ./mysql/data/:/var/lib/mysql
+      - ./mysql/data/:/var/lib/mysql
       - ./logs/mysql:/var/log/mysql
     env_file: .env
 
