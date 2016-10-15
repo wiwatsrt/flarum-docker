@@ -7,6 +7,7 @@ services:
     image: nginx:stable-alpine
     ports:
       - "80:80"
+      - "443:443"
     links:
       - phpfpm:phpfpm
     volumes:
