@@ -1,4 +1,4 @@
-.env
-log
+cache
+logs
 mysql/databases
 www
