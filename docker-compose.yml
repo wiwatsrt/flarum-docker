@@ -19,7 +19,7 @@ services:
     volumes:
       - ./mysql/initdb:/docker-entrypoint-initdb.d
       - ./mysql/conf.d:/etc/mysql/conf.d
-      # - ./mysql/data:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql
       - ./mysql/log:/var/log/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=R!123456#
