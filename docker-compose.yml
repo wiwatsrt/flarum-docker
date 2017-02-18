@@ -1,43 +1,42 @@
 version: '2'
 
 services:
-  
-  nginx:
+  web:
     restart: always
     image: nginx:stable-alpine
-    ports:
-      - "80:80"
-      - "443:443"
     links:
       - phpfpm:phpfpm
     volumes:
       - ./cache/nginx:/var/cache/nginx
-      - ./www:/usr/share/nginx/html
+      - ./www:/var/www
       - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./logs/nginx:/var/log/nginx
-
-  phpfpm:
-    image: wiwatsrt/flarum-docker-phpfpm
-    restart: always
-    links:
-      - db:db
-    volumes:
-      - ./www:/usr/share/nginx/html
-      - ./phpfpm/php-fpm.conf:/usr/local/etc/php-fpm.conf
-      - ./phpfpm/php.ini:/usr/local/etc/php/php.ini
-      - ./logs/php-fpm:/var/log/php-fpm
-
-  db:
+    ports:
+      - "80:80"
+  mysql:
     image: mariadb:10.1
+    volumes:
+      - ./mysql/initdb:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      # - ./mysql/data:/var/lib/mysql
+      - ./mysql/log:/var/log/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=R!123456#
+      - MYSQL_DATABASE=homestead
+      - MYSQL_USER=homestead
+      - MYSQL_PASSWORD=secret
     restart: always
+  phpfpm:
+    image: wiwatsrt/docker-laravel-php7fpm
+    links:
+      - mysql:mysql
+    depends_on:
+      - mysql
     volumes:
-      - ./mysql/initdb/:/docker-entrypoint-initdb.d
-      - ./mysql/data/:/var/lib/mysql
-      - ./logs/mysql:/var/log/mysql
-    env_file: .env
-
+      - ./www:/var/www
+    restart: always
   composer:
-    image: wiwatsrt/flarum-docker-composer
-    volumes:
-      - ./www/:/usr/share/nginx/html
+    image: wiwatsrt/docker-laravel-composer
+    volumes_from:
+      - phpfpm
