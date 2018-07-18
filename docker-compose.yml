@@ -1,42 +1,44 @@
-version: '2'
+version: '3'
 
 services:
   web:
-    restart: always
-    image: nginx:stable-alpine
-    links:
-      - phpfpm:phpfpm
-    volumes:
-      - ./cache/nginx:/var/cache/nginx
-      - ./www:/var/www
-      - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./logs/nginx:/var/log/nginx
+    image: nginx:1.14-alpine
     ports:
-      - "80:80"
+      - "8080:80"
+    networks:
+      - frontend
+    volumes:
+      - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./www:/var/www
+      - ./logs/nginx:/var/log/nginx
+  php:
+    image: wiwatsrt/docker-laravel-php7fpm:7.2
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ./www:/var/www
+    depends_on:
+      - mysql
   mysql:
     image: mariadb:10.1
+    networks:
+      - backend
     volumes:
-      - ./mysql/initdb:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
       - ./mysql/conf.d:/etc/mysql/conf.d
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/log:/var/log/mysql
+      - ./mysql/initdb:/docker-entrypoint-initdb.d
+      - ./logs/mysql:/var/log/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=R!123456#
       - MYSQL_DATABASE=homestead
       - MYSQL_USER=homestead
       - MYSQL_PASSWORD=secret
-    restart: always
-  phpfpm:
-    image: wiwatsrt/docker-laravel-php7fpm
-    links:
-      - mysql:mysql
-    depends_on:
-      - mysql
-    volumes:
-      - ./www:/var/www
-    restart: always
-  composer:
-    image: wiwatsrt/docker-laravel-composer
-    volumes_from:
-      - phpfpm
+
+networks:
+    frontend:
+    backend:
+
+volumes:
+    db_data:
